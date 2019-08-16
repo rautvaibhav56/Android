@@ -1,0 +1,91 @@
+//CRUD
+
+
+package com.sunbeam.crud;
+
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+
+import com.sunbeam.crud.db.SQLiteHelper;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+
+    public void create(View v) {
+        SQLiteHelper helper = new SQLiteHelper(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("firstName", "userfirst");
+        values.put("lastName", "userlast");
+        values.put("address", "Pune");
+
+        db.insert("Contact", null, values);
+
+        db.close();
+    }
+
+    public void read(View v) {
+        SQLiteHelper helper = new SQLiteHelper(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        String columns[] = { "id", "firstName", "lastName", "address" };
+        Cursor cursor = db.query("Contact", columns, null, null, null, null, null);
+
+        if (!cursor.isAfterLast()) {
+            cursor.moveToFirst();
+
+            while(!cursor.isAfterLast()) {
+                int id = cursor.getInt(0);
+                String firstName = cursor.getString(1);
+                String lastName = cursor.getString(2);
+                String address = cursor.getString(3);
+
+                Log.d("id", "" + id);
+                Log.d("firstName", firstName);
+                Log.d("lastName", lastName);
+                Log.d("address", address);
+
+                cursor.moveToNext();
+            }
+        } else {
+            Log.d("message", "No record in the db");
+        }
+
+        db.close();
+    }
+
+    public void update(View v) {
+        SQLiteHelper helper = new SQLiteHelper(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("firstName", "userfirstupdated");
+        values.put("lastName", "userlastupdated");
+        values.put("address", "Puneupdated");
+
+        // update Contact set .... where id = 1;
+        db.update("Contact", values, "id = ?", new String[] {"1"});
+
+        db.close();
+    }
+
+    public void delete(View v) {
+        SQLiteHelper helper = new SQLiteHelper(this);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        db.delete("Contact", "id = ?", new String[] {"1"});
+
+        db.close();
+    }
+}
